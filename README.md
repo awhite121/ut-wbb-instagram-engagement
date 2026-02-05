@@ -50,9 +50,6 @@ To frame this as a classification problem, engagement was defined **relative to 
 
 This avoids arbitrary thresholds and focuses on what outperforms typical content.
 
-**Visual (recommended):**  
-<img src="figures/eda_overview.png" width="850" />
-
 ---
 
 ## Feature Construction (Unstructured → Structured)
@@ -71,9 +68,6 @@ Caption text was cleaned and vectorized using a **Bag-of-Words** approach, captu
 Together, image labels and captions provide two complementary views of each post:
 - **What the image shows**
 - **How the post tells the story**
-
-**Visual (recommended):**  
-<img src="figures/top_terms_labels_vs_captions.png" width="850" />
 
 ---
 
@@ -103,8 +97,7 @@ The dataset consisted of **548 total posts** (**383 train / 165 test**) with a n
 However, for social media strategy, the priority is **surfacing posts likely to perform well** — meaning **missing a high-performing post (false negative)** is more costly than occasionally flagging a lower-performing post.
 
 Even though the captions-only and combined models had the same accuracy, confusion-matrix review showed the **combined model** did a **better job detecting high-engagement posts**, so it was selected as the preferred approach.
-
-**Visual (recommended):** 
+ 
 ![Model Comparison](figures/model_comparison.png)
 
 
@@ -127,8 +120,7 @@ Topic proportions showed clear differences:
 - **Low-engagement posts skewed more toward Posters & Branding**
 - Off-court content acted as a strong differentiator in the higher-performing posts
 
-**Visual (recommended):**  
-<img src="figures/lda_topic_proportions.png" width="850" />
+![LDA Topics](figures/lda_topic_visuals.png)
 
 ---
 
@@ -172,9 +164,4 @@ The same workflow can be applied to:
 - **Business Translation:** turning model output into content strategy recommendations  
 
 ---
-
-## Files in This Repo
-- **Notebook:** `Final_2026_send.ipynb`
-- **Report:** `reports/Final_2026_send.pdf`
-- **Figures:** `figures/`
 
