@@ -104,8 +104,9 @@ However, for social media strategy, the priority is **surfacing posts likely to 
 
 Even though the captions-only and combined models had the same accuracy, confusion-matrix review showed the **combined model** did a **better job detecting high-engagement posts**, so it was selected as the preferred approach.
 
-**Visual (recommended):**  
-<img src="figures/model_accuracy_confusion.png" width="850" />
+**Visual (recommended):** 
+![Model Comparison](figures/model_comparison.png)
+
 
 ---
 
