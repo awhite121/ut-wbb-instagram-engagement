@@ -1,167 +1,155 @@
-# 🏀 Texas Women’s Basketball Instagram Engagement Analysis 🏀
-**Unstructured Data · Web Scraping · Computer Vision · Text Analytics · Classification**
+# 🏀 Texas WBB Instagram Engagement Analysis
 
-**Project Type:** Unstructured Data Analysis + Classification  
-**Tools:** Python, Selenium, BeautifulSoup, Pandas, Google Vision API, Scikit-learn, LDA  
-**Data:** 500+ Instagram posts from UT Women’s Basketball  
-**Output:** Engagement prediction + content strategy insights  
+> What should UT Women's Basketball post more of — and why? An end-to-end pipeline from web scraping to content strategy using computer vision, NLP, and classification modeling on 500+ Instagram posts.
+
+**Tech:** Python · Selenium · BeautifulSoup · Google Vision API · scikit-learn · LDA · pandas · Matplotlib
 
 ---
 
-## Project Overview
+## Key Findings
 
-Social media is one of the primary ways collegiate athletic programs connect with fans, recruits, and alumni. For Texas Women’s Basketball, Instagram plays a key role in telling the program’s story — from game action and player moments to announcements and branding.
-
-This project analyzes how **visual content and caption text** influence Instagram engagement for the University of Texas Women’s Basketball team. Starting from raw, publicly available Instagram content, I built an end-to-end pipeline that **scrapes posts, extracts visual and textual signals, trains predictive models, and translates results into actionable content strategy insights.**
-
-The goal is not just prediction, but insight:  
-**What should the program post more of — and why?**
-
----
-
-## Business Question
-
-**Which types of Instagram posts generate higher engagement for Texas Women’s Basketball, and what content characteristics consistently drive strong performance?**
+| Insight | Detail |
+|---------|--------|
+| **Captions > Images** for predicting engagement | Caption features alone matched the combined model at 64.85% accuracy |
+| **Behind-the-scenes content wins** | Off-court / player moments were the strongest differentiator for high engagement |
+| **Static graphics underperform** | Posters and branded announcements consistently skewed toward low engagement |
+| **Best model: Combined (Vision + Text)** | Same accuracy as captions-only, but better recall on high-engagement posts |
 
 ---
 
-## Pipeline at a Glance
+## The Problem
 
-**Scrape Instagram posts → label images → process captions → define engagement → train classifiers → interpret features → uncover themes → recommend content strategy**
+Social media teams post daily but rarely have data-driven guidance on *what actually works*. This project builds a pipeline that starts from raw Instagram content and ends with actionable recommendations — not just predictions, but **strategy**.
 
----
-
-## Data & Problem Setup
-
-### Data Sources and Collection
-Because Instagram data is not directly available as a structured dataset, posts were collected using **web scraping and browser automation**. Using **Selenium** and **BeautifulSoup**, I scraped over **500 posts** from the official UT Women’s Basketball Instagram account.
-
-For each post, the following fields were collected:
-- **Image URL** (visual content)  
-- **Caption text** (language, hashtags, emojis)  
-- **Number of likes** (engagement metric)
-
-This mirrors a real-world analytics scenario where data must be assembled from **unstructured, dynamic webpages** before any modeling can begin.
-
-### Engagement Definition
-To frame this as a classification problem, engagement was defined **relative to the account’s own performance**:
-- Posts above the median number of likes → **High engagement**
-- Posts below the median → **Low engagement**
-
-This avoids arbitrary thresholds and focuses on what outperforms typical content.
+**Business question:** Which types of Instagram posts generate higher engagement for Texas Women's Basketball, and what content characteristics consistently drive strong performance?
 
 ---
 
-## Feature Construction (Unstructured → Structured)
+## Pipeline
 
-### Image Labeling (Computer Vision)
-Each Instagram image was processed using the **Google Vision API**, which extracts descriptive labels representing what appears in the image (e.g., basketball game, celebration, crowd, athlete).
-
-This step converts raw visual content into **model-ready textual features** while preserving interpretability.
-
-### Caption Text Processing
-Caption text was cleaned and vectorized using a **Bag-of-Words** approach, capturing:
-- Keywords  
-- Hashtags  
-- Emojis and short hype phrases  
-
-Together, image labels and captions provide two complementary views of each post:
-- **What the image shows**
-- **How the post tells the story**
+```
+Scrape 500+ posts (Selenium + BeautifulSoup)
+    → Label images (Google Vision API)
+    → Process captions (Bag-of-Words)
+    → Define engagement (above/below median likes)
+    → Train classifiers (Logistic Regression)
+    → Discover themes (LDA topic modeling)
+    → Translate into content strategy
+```
 
 ---
 
-## Engagement Prediction (Logistic Regression)
+## Data
 
-To understand which sources of information are most predictive of Instagram engagement, three logistic regression models were trained, each using a different feature set:
-- **Image labels only** (visual content from Google Vision API)  
-- **Captions only** (text, hashtags, emojis)  
-- **Combined image labels + captions**  
+**Source:** 500+ posts scraped from the official [@texaswbb](https://www.instagram.com/texaswbb/) Instagram account using Selenium browser automation.
 
-Each model predicts whether a post will receive high or low engagement, defined relative to the account’s median likes.
+| Field | Type | Role |
+|-------|------|------|
+| Image | Unstructured (visual) | Processed via Google Vision API → descriptive labels |
+| Caption | Unstructured (text) | Cleaned, vectorized via Bag-of-Words |
+| Likes | Numeric | Binary target: above median = High, below = Low |
 
-### Model Results
-Across all models, **caption-based features** consistently outperformed **image-only features**, indicating that **language and context** play a stronger direct role in engagement than visual descriptors alone. However, **image content** still contributed meaningful signal, particularly for emotionally charged or dynamic posts.
-
-**Test performance (Accuracy):**
-- **Image labels only:** 60.00%  
-- **Captions only:** 64.85%  
-- **Combined (labels + captions):** 64.85%  
+**Split:** 383 train / 165 test · Nearly balanced (275 high vs 273 low)
 
 ---
 
-## Evaluation & Model Selection (Condensed)
+## Feature Engineering: Unstructured → Structured
 
-The dataset consisted of **548 total posts** (**383 train / 165 test**) with a nearly balanced target (**275 high vs 273 low**), so accuracy was a reasonable baseline metric.
+**Images:** Each photo passed through the **Google Vision API**, which extracts labels like *basketball game*, *celebration*, *crowd*, *athlete*. This converts raw pixels into model-ready text features while preserving interpretability.
 
-However, for social media strategy, the priority is **surfacing posts likely to perform well** — meaning **missing a high-performing post (false negative)** is more costly than occasionally flagging a lower-performing post.
+**Captions:** Cleaned and vectorized using Bag-of-Words — capturing keywords, hashtags, emojis, and short hype phrases.
 
-Even though the captions-only and combined models had the same accuracy, confusion-matrix review showed the **combined model** did a **better job detecting high-engagement posts**, so it was selected as the preferred approach.
- 
+These two feature sets give complementary views of every post: *what the image shows* vs. *how the post tells the story*.
+
+---
+
+## Classification Results
+
+Three logistic regression models, each with a different feature set:
+
+| Model | Accuracy | Strength |
+|-------|----------|----------|
+| Image labels only | 60.0% | Captures visual content type |
+| Captions only | 64.85% | Language and context are more predictive |
+| **Combined (labels + captions)** | **64.85%** | **Better high-engagement recall** ✅ |
+
+The combined model was selected because confusion matrix analysis showed it **caught more high-performing posts** — the outcome that matters most for a social media team.
+
 ![Model Comparison](figures/model_comparison.png)
 
-
 ---
 
-## Interpreting Content Themes (Topic Modeling)
+## Topic Modeling: Why Do Posts Succeed?
 
-Prediction alone doesn’t explain why posts succeed. To uncover underlying patterns, **Latent Dirichlet Allocation (LDA)** was applied to the image labels to identify recurring visual themes across posts.
+Prediction alone doesn't explain *why*. **LDA (Latent Dirichlet Allocation)** was applied to image labels to uncover recurring visual themes. A 3-topic solution balanced interpretability and coverage:
 
-A **3-topic** solution was selected to balance interpretability and coverage. Each post was represented as a mixture of these topics, allowing comparison between **high- vs low-engagement** content themes.
-
-The three discovered topics can be summarized as:
-- **Topic 1 – Posters & Branding:** game posters, announcement graphics, branded visuals  
-- **Topic 2 – Off-Court / Behind the Scenes:** team moments, people-focused content, non-game settings  
-- **Topic 3 – In-Game / Live Action:** gameplay, on-court action, competitive moments  
-
-### High vs Low Engagement Themes (Key Finding)
-Topic proportions showed clear differences:
-- **High-engagement posts skewed more toward Off-Court / Behind-the-Scenes and In-Game content**
-- **Low-engagement posts skewed more toward Posters & Branding**
-- Off-court content acted as a strong differentiator in the higher-performing posts
+| Topic | Theme | Engagement Signal |
+|-------|-------|-------------------|
+| **Topic 1** | Posters & Branding | ⬇️ Skews low engagement |
+| **Topic 2** | Off-Court / Behind the Scenes | ⬆️ Strongest high-engagement differentiator |
+| **Topic 3** | In-Game / Live Action | ⬆️ Skews high engagement |
 
 ![LDA Topics](figures/lda_topic_visuals.png)
 
 ---
 
-## Insights & Recommendations
+## Content Strategy Recommendations
 
-### What Works Best
-- Posts featuring **players in motion or celebration**
-- Content that captures **emotion, energy, and connection**
-- Captions that add **narrative** or highlight key moments
+### Post more of ✅
+- Players in motion or celebration — emotion and energy
+- Behind-the-scenes team moments and off-court connection
+- Captions that **tell a story**, not just deliver information
+- In-game and post-game moments
 
-### What Underperforms
-- Static promotional graphics
+### Post less of ⬇️
+- Static promotional graphics without context
 - Low-context announcements without storytelling
-
-### Content Strategy Recommendations
-- Prioritize **in-game and post-game moments**
-- Pair visuals with captions that **tell a story**, not just deliver information
-- Use branding graphics selectively and support them with compelling language
-- Lean into **emotion and fan connection** rather than purely informational posts
+- Branding-heavy posts without compelling language
 
 ---
 
-## Why This Matters
+## Repository Structure
 
-This project demonstrates how unstructured data — images and text — can be transformed into actionable insights using modern analytics techniques. Rather than guessing what content works, the approach provides a data-driven framework for shaping social media strategy in collegiate athletics.
+```
+├── ut_womens_basketball_final.ipynb    # Full analysis pipeline
+├── cleaned_data_with_image_labels.xlsx # Processed dataset
+├── figures/                            # Charts and visualizations
+│   ├── model_comparison.png
+│   └── lda_topic_visuals.png
+├── outputs/                            # Model outputs
+└── README.md
+```
 
-The same workflow can be applied to:
-- Professional sports teams
-- Brand social media accounts
-- Marketing and content analytics teams
+---
+
+## How to Run
+
+```bash
+git clone https://github.com/awhite121/ut-wbb-instagram-engagement.git
+cd ut-wbb-instagram-engagement
+pip install pandas numpy scikit-learn matplotlib seaborn selenium beautifulsoup4
+jupyter notebook ut_womens_basketball_final.ipynb
+```
+
+> **Note:** Image labeling requires a [Google Vision API](https://cloud.google.com/vision) key. The pre-labeled dataset (`cleaned_data_with_image_labels.xlsx`) is included so you can skip that step.
 
 ---
 
-## Tools & Skills Demonstrated
+## Skills Demonstrated
 
-- **Web Scraping & Data Collection:** Selenium, BeautifulSoup  
-- **Computer Vision:** Google Vision API  
-- **Text Analytics:** Bag-of-Words / vectorization  
-- **Classification Modeling:** Logistic Regression (scikit-learn)  
-- **Topic Modeling:** LDA  
-- **Business Translation:** turning model output into content strategy recommendations  
+| Skill Area | Tools / Methods |
+|-----------|----------------|
+| Web Scraping | Selenium, BeautifulSoup |
+| Computer Vision | Google Vision API |
+| Text Analytics | Bag-of-Words vectorization |
+| Classification | Logistic Regression (scikit-learn) |
+| Topic Modeling | LDA (Latent Dirichlet Allocation) |
+| Business Translation | Model output → content strategy recommendations |
 
 ---
+
+## Author
+
+Andrew White — [GitHub](https://github.com/awhite121)
+*MSBA coursework — Unstructured Data Analytics, University of Texas at Austin*
 
